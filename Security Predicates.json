@@ -1,0 +1,335 @@
+{
+    "version": "65.0",
+    "nodes": {
+        "LOAD_DATASET0": {
+            "action": "load",
+            "parameters": {
+                "dataset": {
+                    "connectionName": "SFDC_LOCAL",
+                    "label": "UserRole",
+                    "sourceObjectName": "UserRole",
+                    "type": "connectedDataset"
+                },
+                "fields": [
+                    "Id",
+                    "Name",
+                    "ParentRoleId",
+                    "RollupDescription",
+                    "OpportunityAccessForAccountOwner",
+                    "CaseAccessForAccountOwner",
+                    "ContactAccessForAccountOwner",
+                    "ForecastUserId",
+                    "MayForecastManagerShare",
+                    "LastModifiedDate",
+                    "LastModifiedById",
+                    "SystemModstamp",
+                    "DeveloperName",
+                    "PortalAccountId",
+                    "PortalType",
+                    "PortalAccountOwnerId"
+                ],
+                "preserveCurrencyFields": [],
+                "sampleDetails": {
+                    "sortBy": [],
+                    "type": "TopN"
+                }
+            },
+            "sources": []
+        },
+        "LOAD_DATASET1": {
+            "action": "load",
+            "parameters": {
+                "dataset": {
+                    "connectionName": "SFDC_LOCAL",
+                    "label": "User",
+                    "sourceObjectName": "User",
+                    "type": "connectedDataset"
+                },
+                "fields": [
+                    "Id",
+                    "Username",
+                    "LastName",
+                    "FirstName",
+                    "Name",
+                    "CompanyName",
+                    "Division",
+                    "Department",
+                    "Title",
+                    "Street",
+                    "City",
+                    "State",
+                    "PostalCode",
+                    "Country",
+                    "Email",
+                    "Phone",
+                    "MobilePhone",
+                    "Alias",
+                    "IsActive",
+                    "TimeZoneSidKey",
+                    "UserRoleId",
+                    "ReceivesInfoEmails",
+                    "UserType",
+                    "ManagerId",
+                    "ForecastEnabled",
+                    "AccountId",
+                    "FullPhotoUrl",
+                    "SmallPhotoUrl",
+                    "MediumPhotoUrl",
+                    "BannerPhotoUrl",
+                    "SmallBannerPhotoUrl",
+                    "MediumBannerPhotoUrl"
+                ],
+                "preserveCurrencyFields": [],
+                "sampleDetails": {
+                    "sortBy": [],
+                    "type": "TopN"
+                }
+            },
+            "sources": []
+        },
+        "LOAD_DATASET2": {
+            "action": "load",
+            "parameters": {
+                "dataset": {
+                    "connectionName": "SFDC_LOCAL",
+                    "label": "Opportunity",
+                    "sourceObjectName": "Opportunity",
+                    "type": "connectedDataset"
+                },
+                "fields": [
+                    "Id",
+                    "IsDeleted",
+                    "AccountId",
+                    "RecordTypeId",
+                    "IsPrivate",
+                    "Name",
+                    "Description",
+                    "StageName",
+                    "Amount",
+                    "Probability",
+                    "ExpectedRevenue",
+                    "TotalOpportunityQuantity",
+                    "CloseDate",
+                    "Type",
+                    "NextStep",
+                    "LeadSource",
+                    "IsClosed",
+                    "IsWon",
+                    "ForecastCategory",
+                    "ForecastCategoryName",
+                    "CampaignId",
+                    "HasOpportunityLineItem",
+                    "Pricebook2Id",
+                    "OwnerId",
+                    "CreatedDate",
+                    "CreatedById",
+                    "LastModifiedDate",
+                    "LastModifiedById",
+                    "SystemModstamp",
+                    "LastActivityDate",
+                    "PushCount",
+                    "LastStageChangeDate",
+                    "FiscalQuarter",
+                    "FiscalYear",
+                    "Fiscal",
+                    "ContactId",
+                    "LastViewedDate",
+                    "LastReferencedDate",
+                    "HasOpenActivity",
+                    "HasOverdueTask",
+                    "LastAmountChangedHistoryId",
+                    "LastCloseDateChangedHistoryId",
+                    "DeliveryInstallationStatus__c",
+                    "TrackingNumber__c",
+                    "OrderNumber__c",
+                    "CurrentGenerators__c",
+                    "MainCompetitors__c",
+                    "Amount_CAD__c",
+                    "Opportunity_Source__c"
+                ],
+                "preserveCurrencyFields": [],
+                "sampleDetails": {
+                    "sortBy": [],
+                    "type": "TopN"
+                }
+            },
+            "sources": []
+        },
+        "JOIN0": {
+            "action": "join",
+            "parameters": {
+                "joinType": "LOOKUP",
+                "leftKeys": [
+                    "OwnerId"
+                ],
+                "rightKeys": [
+                    "Id"
+                ],
+                "rightQualifier": "User"
+            },
+            "schema": {
+                "fields": [],
+                "slice": {
+                    "fields": [],
+                    "ignoreMissingFields": true,
+                    "mode": "DROP"
+                }
+            },
+            "sources": [
+                "LOAD_DATASET2",
+                "LOAD_DATASET1"
+            ]
+        },
+        "JOIN1": {
+            "action": "join",
+            "parameters": {
+                "joinType": "LOOKUP",
+                "leftKeys": [
+                    "User.UserRoleId"
+                ],
+                "rightKeys": [
+                    "Id"
+                ],
+                "rightQualifier": "UserRole"
+            },
+            "schema": {
+                "fields": [],
+                "slice": {
+                    "fields": [],
+                    "ignoreMissingFields": true,
+                    "mode": "DROP"
+                }
+            },
+            "sources": [
+                "JOIN0",
+                "LOAD_DATASET0"
+            ]
+        },
+        "FORMULA0": {
+            "action": "formula",
+            "parameters": {
+                "expressionType": "SQL",
+                "fields": [
+                    {
+                        "defaultValue": "",
+                        "formulaExpression": "\"UserRole.Name\"",
+                        "label": "Role",
+                        "name": "UserRole.Name_formula",
+                        "precision": 255,
+                        "type": "TEXT"
+                    }
+                ]
+            },
+            "sources": [
+                "JOIN1"
+            ]
+        },
+        "OUTPUT0": {
+            "action": "save",
+            "parameters": {
+                "dataset": {
+                    "label": "Test_1",
+                    "name": "Test_1",
+                    "rowLevelSecurityFilter": "'OwnerId' == \"$User.Id\" || 'UserRole.ParentRoleId' == \"$User.UserRoleId\"\n",
+                    "type": "analyticsDataset"
+                },
+                "fields": [],
+                "measuresToCurrencies": []
+            },
+            "sources": [
+                "FORMULA0"
+            ]
+        }
+    },
+    "ui": {
+        "nodes": {
+            "LOAD_DATASET0": {
+                "label": "UserRole",
+                "type": "LOAD_DATASET",
+                "top": 391.8,
+                "left": 112.69999999999999,
+                "parameters": {
+                    "sampleSize": 2000
+                }
+            },
+            "LOAD_DATASET1": {
+                "label": "User",
+                "type": "LOAD_DATASET",
+                "top": 252,
+                "left": 112,
+                "parameters": {
+                    "sampleSize": 2000
+                }
+            },
+            "LOAD_DATASET2": {
+                "label": "Opportunity",
+                "type": "LOAD_DATASET",
+                "top": 112.1,
+                "left": 113.1,
+                "parameters": {
+                    "sampleSize": 2000
+                }
+            },
+            "JOIN0": {
+                "label": "Join 0",
+                "type": "JOIN",
+                "top": 112,
+                "left": 253.10000000000002
+            },
+            "JOIN1": {
+                "label": "Join 1",
+                "type": "JOIN",
+                "top": 112,
+                "left": 393.1
+            },
+            "TRANSFORM0": {
+                "label": "Transform 0",
+                "type": "TRANSFORM",
+                "top": 112,
+                "left": 532,
+                "graph": {
+                    "FORMULA0": {
+                        "parameters": {
+                            "type": "BASE_FORMULA_UI"
+                        },
+                        "label": "Formula"
+                    }
+                },
+                "connectors": []
+            },
+            "OUTPUT0": {
+                "label": "Output 0",
+                "type": "OUTPUT",
+                "top": 112,
+                "left": 672
+            }
+        },
+        "connectors": [
+            {
+                "source": "LOAD_DATASET2",
+                "target": "JOIN0"
+            },
+            {
+                "source": "LOAD_DATASET1",
+                "target": "JOIN0"
+            },
+            {
+                "source": "JOIN0",
+                "target": "JOIN1"
+            },
+            {
+                "source": "LOAD_DATASET0",
+                "target": "JOIN1"
+            },
+            {
+                "source": "JOIN1",
+                "target": "TRANSFORM0"
+            },
+            {
+                "source": "TRANSFORM0",
+                "target": "OUTPUT0"
+            }
+        ],
+        "hiddenColumns": []
+    }
+}
